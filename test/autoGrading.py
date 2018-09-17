@@ -8,6 +8,7 @@ hw_id_list = ['hw1']
 for c_file_path in glob.glob('./*.c'):
 	c_file = os.path.basename(c_file_path)
 	student_id = c_file.split('_')[0]
+	print(c_file.split('_'))
 	hw_id = c_file.split('_')[1].split('.c')[0]
 	if hw_id not in hw_id_list:
 		print('Wrong file name:', c_file)
@@ -16,7 +17,6 @@ for c_file_path in glob.glob('./*.c'):
 		file_name = c_file
 		file_name_prefix = file_name.split('.c')[0]
 		cmd = ['gcc','-o', file_name_prefix, file_name]
-		print(file_name_prefix)
 		subprocess.call(cmd)
 		input = b'''100'''
 		# Launch a command with pipes
