@@ -112,21 +112,19 @@ class Student(object):
             s += '\n\tcfile : %s' % (self.hw_info[hw_id]['cfile'])
             s += '\n\tstate : %s' % (self.hw_info[hw_id]['state'])
             if self.hw_info[hw_id]['fail_info'].strip():
-                s += '\n\tfail_info : %s'% (self.hw_info[hw_id]['fail_info'])
-        s += '\n' + '-'* 50 + '\n'
+                s += '\n\tfail_info : %s' % (self.hw_info[hw_id]['fail_info'])
+        s += '\n' + '-' * 50 + '\n'
         return s
 
 
 #####################
 ### Main Program  ###
 #####################
-
 import json
 
-with open("hw1.json") as f:
-    json_data = json.load(f)
-
 # Hw info & test case
+with open("hw2.json") as f:
+    json_data = json.load(f)
 hw_id_list = json_data['hw_id_list']
 testCase_list = []
 for i, hw_id in enumerate(hw_id_list):
@@ -138,11 +136,18 @@ for i, hw_id in enumerate(hw_id_list):
         testCase.append((input_, output))
 
 # Student id & Create a list of student
-student_id_list = ['0756079']
+student_id_list = []
+
+# TA Version
+with open("StuID.json") as f:
+    json_data = json.load(f)
+    student_id_list = json_data['stu_id_list']
+
+# Student Version
 print('Enter your student ID : ', end='')
 stuID = input()
-if stuID is not None:
-    print('AutoGrading for student %s' %stuID)
+if stuID:
+    print('AutoGrading for student %s' % stuID)
     student_id_list = [stuID]
 
 student_list = []
@@ -154,6 +159,6 @@ for stu in student_list:
     for testCase, hw_id in zip(testCase_list, hw_id_list):
         stu.runTestCase(hw_id, testCase)
     print(stu)
-    print('Finish autoGrading, Your Score is %.2f (Pass %i/%i questions) ' %(stu.evaluate_score(), stu.num_questions_pass, stu.num_questions_total))
+    print('Finish autoGrading, Your Score is %.2f (Pass %i/%i questions) ' % (stu.evaluate_score(), stu.num_questions_pass, stu.num_questions_total))
 
 a = input()
