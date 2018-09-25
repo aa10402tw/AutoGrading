@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['autoGrading.py'],
-             pathex=['C:\\Users\\USER\\Desktop\\ºÓ¤@¤W\\IntroCS TA\\AutoGrading\\HW2\\Student Version'],
+             pathex=['C:\\Users\\User\\Desktop\\Code\\AutoGrading\\HW2\\Student Version'],
              binaries=[],
              datas=[('hw2.json', '.')],
              hiddenimports=[],

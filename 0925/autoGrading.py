@@ -27,6 +27,13 @@ class TestCase(object):
         self.inputs.append(input_)
         self.outputs.append(output)
 
+    @staticmethod
+    def processOutput(s):
+        s = str(s)
+        s = s.replace('\r', ' ')
+        s = s.replace('\t', ' ')
+        s = s.replace('\n', ' ')
+        return " ".join(s.split())
 
 class Student(object):
     def __init__(self, stu_id, hw_id_list):
@@ -98,9 +105,7 @@ class Student(object):
                         # To interpret as text, decode
                         output = stdout.decode('utf-8')
 
-                        if(str(output) == str(expected_output)):
-                            num_pass += 1
-                        elif testCase.mode == 'loose' and (" ".join(str(expected_output).split())) in (" ".join(str(output).split())):
+                        if(TestCase.processOutput(output) == TestCase.processOutput(expected_output)):
                             num_pass += 1
                         else:
                             s = 'Test Case #%i : input [%s], expected output is [%s] but got [%s]\n' % (num_test, repr(str(input_)), repr(expected_output), repr(output))
