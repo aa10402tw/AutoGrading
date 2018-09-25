@@ -3,15 +3,12 @@
 
 int main()
 {
-    float f;
-    int in;
+    int in = 0;
 
     while(1){
 
         printf("Please enter a number: ");
-        scanf("%f", &f);
-
-        in = (int)f;
+        scanf("%d", &in);
 
         if(in == -1) break;
 
@@ -20,6 +17,7 @@ int main()
         }else{
             printf("The number is odd.\n");
         }
+
     }//end while
 
     return 0;

@@ -1,5 +1,5 @@
 {
-	"description" : "HW1", 
+	"description" : "HW2", 
 	"num_questions": 6,
 	"hw_id_list" : ["hw2a", "hw2b", "hw2c", "hw2d", "hw2e", "hw2f"],
 	
@@ -13,43 +13,55 @@
 			[
 				{
 					"input": "",
-					"output": "char's memory size: 1 byte\nshort's memory size: 2 bytes\nfloat's memory size: 4 bytes\ndouble's memory size: 8 bytes"
+					"output": "char's memory size: 1 byte\nshort's memory size: 2 bytes\nint's memory size: 4 bytes\nfloat's memory size: 4 bytes\ndouble's memory size: 8 bytes"
 				}
 			]
 		},
 		
 		{
 			"hw_id" : "hw1b", 
-			"num_tests" : 1, 
+			"num_tests" : 2, 
 			"test_case":
 			[
 				{
 					"input": "37",
 					"output": "Please enter a Celsius temperature:\nFahrenheit temperature is 98.60."
+				},
+				{
+					"input": "50.5",
+					"output": "Please enter a Celsius temperature: \nFahrenheit temperature is 122.90."
 				}
 			]
 		},
 		
 		{
 			"hw_id" : "hw1c", 
-			"num_tests" : 1, 
+			"num_tests" : 2, 
 			"test_case":
 			[
 				{
-					"input": "9/9/2018",
-					"output": "Please enter a data (format: mm/dd/yyyy):\nyour input data is 20180909."
+					"input": "09/21/2018",
+					"output": "Please enter a data (format: mm/dd/yyyy):\nyour input data is 20180921."
+				},
+				{
+					"input": "9/21/2018",
+					"output": "Please enter a data (format: mm/dd/yyyy):\nyour input data is 20180921."
 				}
 			]
 		},
 		
 		{
 			"hw_id" : "hw1d", 
-			"num_tests" : 1, 
+			"num_tests" : 2, 
 			"test_case":
 			[
 				{
 					"input": "x",
-					"output": "Please enter a char:\nyour char is 'x', it ASCII code is 120."
+					"output": "Please enter a char: \nyour char is 'x', it ASCII code is 120."
+				},
+				{
+					"input": "X",
+					"output": "Please enter a char: \nyour char is 'X', it ASCII code is 88."
 				}
 			]
 		},
@@ -72,13 +84,21 @@
 		
 		{
 			"hw_id" : "hw1f", 
-			"num_tests" : 1, 
+			"num_tests" : 3, 
 			"test_case":
 			[
 				{
+					"input": "-1",
+					"output": "Please enter a number: \n"
+				},
+				{
 					"input": "-10\n77\n-1",
-					"output": "Please enter a number:\nThe number is even.\nPlease enter a number:\nThe number is odd.\nPlease enter a number:\n"
-				}	
+					"output": "Please enter a number: \nThe number is even.\nPlease enter a number: \nThe number is odd.\nPlease enter a number: \n"
+				},
+				{
+					"input": "50.5\n-1",
+					"output": "Please enter a number: \nThe number is even.\nPlease enter a number: \n"
+				}
 			]
 		}
 	

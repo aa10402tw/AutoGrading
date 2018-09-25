@@ -8,7 +8,7 @@ int main()
     int day;
 
     printf("Please enter a data (format: mm/dd/yyyy): ");
-    scanf("%d/%d/%d", &day, &month, &year);
+    scanf("%d/%d/%d", &month, &day, &year);
 
     printf("your input data is %04d%02d%02d.", year, month, day);
 

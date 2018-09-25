@@ -65,15 +65,16 @@ class Student(object):
 
     def runTestCase(self, hw_id, testCase):
         if hw_id in self.hw_id_list:
+            self.num_questions_total += 1
             self.hw_info[hw_id]['state'] = 'fail'
             cFile = self.hw_info[hw_id]['cfile']
             if cFile is None:
                 return
             if not os.path.isdir('exe_file'):
                 os.makedirs('exe_file')
-            exeFile = '%s//%s' %('exe_file', os.path.split(cFile)[-1].split('.c')[0]) 
+            exeFile = '%s//%s' % ('exe_file', os.path.split(cFile)[-1].split('.c')[0])
             cmd = ['gcc', '-o', exeFile, cFile]
-            exeFile = '"%s.exe"'%(exeFile)
+            exeFile = '"%s.exe"' % (exeFile)
             try:
                 subprocess.call(cmd, shell=True)
             except:
@@ -88,21 +89,26 @@ class Student(object):
                                          stdin=subprocess.PIPE,
                                          shell=True)
                     # Send the data and get the output
-                    stdout, stderr = p.communicate(str(input_).encode(), timeout=3)
-                    # To interpret as text, decode
-                    output = stdout.decode('utf-8')
-
-                    if(str(output) == str(expected_output)):
-                        num_pass += 1
-                    elif testCase.mode == 'loose' and (" ".join(str(expected_output).split())) in (" ".join(str(output).split())):
-                        num_pass += 1
-                    else:
-                        s = 'Test Case #%i : input [%s], expected output is [%s] but got [%s]\n' % (num_test, str(input_), expected_output, output)
+                    try:
+                        stdout, stderr = p.communicate(str(input_).encode(), timeout=3)
+                    except:
+                        s = 'Test Case #%i timeout error for input [%s]' % (num_test, repr(str(input_)))
                         self.hw_info[hw_id]['fail_info'] += s
-                    if stderr is not None:
-                        err = stderr.decode('utf-8')
-                        self.hw_info[hw_id]['fail_info'] += err
-                self.num_questions_total += 1
+                    else:
+                        # To interpret as text, decode
+                        output = stdout.decode('utf-8')
+
+                        if(str(output) == str(expected_output)):
+                            num_pass += 1
+                        elif testCase.mode == 'loose' and (" ".join(str(expected_output).split())) in (" ".join(str(output).split())):
+                            num_pass += 1
+                        else:
+                            s = 'Test Case #%i : input [%s], expected output is [%s] but got [%s]\n' % (num_test, repr(str(input_)), repr(expected_output), repr(output))
+                            self.hw_info[hw_id]['fail_info'] += s
+                        if stderr is not None:
+                            err = stderr.decode('utf-8')
+                            self.hw_info[hw_id]['fail_info'] += err
+
                 if num_pass == num_test:
                     self.hw_info[hw_id]['state'] = 'pass'
                     self.num_questions_pass += 1
@@ -117,8 +123,8 @@ class Student(object):
             s += '\n\tcfile : %s' % (self.hw_info[hw_id]['cfile'])
             s += '\n\tstate : %s' % (self.hw_info[hw_id]['state'])
             if self.hw_info[hw_id]['fail_info'].strip():
-                s += '\n\tfail_info : %s'% (self.hw_info[hw_id]['fail_info'])
-        s += '\n' + '-'* 50 + '\n'
+                s += '\n\tfail_info : %s' % (self.hw_info[hw_id]['fail_info'])
+        s += '\n' + '-' * 50 + '\n'
         return s
 
 
@@ -128,7 +134,7 @@ class Student(object):
 
 import json
 
-with open("hw1.json") as f:
+with open("hw2.json") as f:
     json_data = json.load(f)
 
 # Hw info & test case
@@ -147,7 +153,7 @@ student_id_list = ['0756079']
 print('Enter your student ID : ', end='')
 stuID = input()
 if stuID is not None:
-    print('AutoGrading for student %s' %stuID)
+    print('AutoGrading for student %s' % stuID)
     student_id_list = [stuID]
 
 student_list = []
@@ -159,6 +165,6 @@ for stu in student_list:
     for testCase, hw_id in zip(testCase_list, hw_id_list):
         stu.runTestCase(hw_id, testCase)
     print(stu)
-    print('Finish autoGrading, Your Score is %.2f (Pass %i/%i questions) ' %(stu.evaluate_score(), stu.num_questions_pass, stu.num_questions_total))
+    print('Finish autoGrading, Your Score is %.2f (Pass %i/%i questions) ' % (stu.evaluate_score(), stu.num_questions_pass, stu.num_questions_total))
 
 a = input()
