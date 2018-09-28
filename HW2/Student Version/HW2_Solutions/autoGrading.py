@@ -1,4 +1,3 @@
-import argparse
 import subprocess
 import glob
 import os
@@ -28,12 +27,14 @@ class TestCase(object):
         self.outputs.append(output)
 
     @staticmethod
-    def processOutput(s):
+    def processOutput(s, omit=['\r', '\t', '\n']):
         s = str(s)
-        s = s.replace('\r', ' ')
-        s = s.replace('\t', ' ')
-        s = s.replace('\n', ' ')
-        return " ".join(s.split())
+        for c in omit:
+            s = s.replace(c, ' ')
+        s = " ".join(s.split())
+        if(' 'in omit): s = s.replace(' ', '')
+        return s
+
 
 class Student(object):
     def __init__(self, stu_id, hw_id_list):
@@ -61,7 +62,7 @@ class Student(object):
             self.hw_info[hw_id]['state'] = 'not processed yet'
 
             # fail_info
-            self.hw_info[hw_id]['fail_info'] = 'Can not find .c file' if cfile is None else ''
+            self.hw_info[hw_id]['fail_info'] = 'Can not find .c file (Expected "%s//%s_%s.c")' % ('source_file', self.stu_id, hw_id)  if cfile is None else ''
 
     def evaluate_score(self):
         num_pass, num_hw = 0, len(self.hw_id_list)
@@ -71,65 +72,132 @@ class Student(object):
         return (num_pass / num_hw) * 100
 
     def runTestCase(self, hw_id, testCase):
-        if hw_id in self.hw_id_list:
-            self.num_questions_total += 1
-            self.hw_info[hw_id]['state'] = 'fail'
-            cFile = self.hw_info[hw_id]['cfile']
-            if cFile is None:
-                return
-            if not os.path.isdir('exe_file'):
-                os.makedirs('exe_file')
-            exeFile = '%s//%s' % ('exe_file', os.path.split(cFile)[-1].split('.c')[0])
-            cmd = ['gcc', '-o', exeFile, cFile]
-            exeFile = '"%s.exe"' % (exeFile)
-            try:
-                subprocess.call(cmd, shell=True)
+        self.hw_info[hw_id]['state'] = 'fail'
+        self.num_questions_total += 1
+        if hw_id not in self.hw_id_list: return
+        if self.hw_info[hw_id]['cfile'] is None: return
+        cFile = self.hw_info[hw_id]['cfile']
+        exeFile = '%s//%s' % ('exe_file', os.path.split(cFile)[-1].split('.c')[0])
+        cmd = ['gcc', '-o', exeFile, cFile]  
+        
+        # Try to Compile
+        try:
+            subprocess.call(cmd)
+        except:
+            self.hw_info[hw_id]['fail_info'] += 'Can not compile .c file'
+            return
+
+        
+        if not os.path.isfile(exeFile+'.exe'):
+            self.hw_info[hw_id]['fail_info'] += 'Can not find .exe file (probably compile fail)'
+            return
+
+        # Start to run test case
+        num_test, num_pass = 0, 0
+        exeFile = '"%s.exe"' % (exeFile)
+        for input_, expected_output in testCase:
+            num_test += 1            
+            p = subprocess.Popen(exeFile, stdout=subprocess.PIPE, stdin=subprocess.PIPE) # Launch a command with pipes
+            # Send input and get ouput 
+            try: 
+                stdout, stderr = p.communicate(str(input_).encode(), timeout=5)
             except:
-                self.hw_info[hw_id]['fail_info'] += 'can not compile .c file'
-            else:
-                num_test, num_pass = 0, 0
-                for input_, expected_output in testCase:
-                    num_test += 1
-                    # Launch a command with pipes
-                    p = subprocess.Popen(exeFile,
-                                         stdout=subprocess.PIPE,
-                                         stdin=subprocess.PIPE,
-                                         shell=True)
-                    # Send the data and get the output
-                    try:
-                        stdout, stderr = p.communicate(str(input_).encode(), timeout=3)
-                    except:
-                        s = 'Test Case #%i timeout error for input [%s]' % (num_test, repr(str(input_)))
-                        self.hw_info[hw_id]['fail_info'] += s
-                    else:
-                        # To interpret as text, decode
-                        output = stdout.decode('utf-8')
+                s = '\n  <Test Case #%i> : timeout error for input [%s]' %(num_test, repr(str(input_)))
+                p.kill()
+                self.hw_info[hw_id]['fail_info'] += s
+                continue
+            if stderr:
+                print('Test', repr(stderr))
+                self.hw_info[hw_id]['fail_info'] += stderr
 
-                        if(TestCase.processOutput(output) == TestCase.processOutput(expected_output)):
-                            num_pass += 1
-                        else:
-                            s = 'Test Case #%i : input [%s], expected output is [%s] but got [%s]\n' % (num_test, repr(str(input_)), repr(expected_output), repr(output))
-                            self.hw_info[hw_id]['fail_info'] += s
-                        if stderr is not None:
-                            err = stderr.decode('utf-8')
-                            self.hw_info[hw_id]['fail_info'] += err
+            # Decode output
+            try:
+                output = stdout.decode('utf-8')
+            except:
+                self.hw_info[hw_id]['fail_info'] += '\n  <Test Case #%i> : output is not utf-8 format'%(num_test)
+                continue
 
-                if num_pass == num_test:
-                    self.hw_info[hw_id]['state'] = 'pass'
-                    self.num_questions_pass += 1
-                else:
-                    self.hw_info[hw_id]['fail_info'] = 'pass ratio %i/%i\n' % (num_pass, num_test) + self.hw_info[hw_id]['fail_info']
+            # Compare user output with answer
+            output_ = TestCase.processOutput(output)
+            expected_output_ = TestCase.processOutput(expected_output)
+            if output_ == expected_output_: # Correct 
+                num_pass += 1 
+            else:  # Incorrect 
+                s = '\n\n  <Test Case #%i> : \n    input [%s], \n    expected output is [%s] \n    but your output is [%s]' %(num_test, repr(str(input_)), expected_output_, output_, )
+                self.hw_info[hw_id]['fail_info'] += s
+
+        # After run all test case, check the pass ratio
+        if num_pass == num_test:
+            self.hw_info[hw_id]['state'] = 'pass'
+            self.num_questions_pass += 1
+        else:
+            self.hw_info[hw_id]['fail_info'] = 'Unable to pass all test cases (pass ratio %i/%i)'%(num_pass, num_test) + self.hw_info[hw_id]['fail_info']
+
+
+    # def runTestCase(self, hw_id, testCase):
+    #     if hw_id in self.hw_id_list:
+    #         self.num_questions_total += 1
+    #         self.hw_info[hw_id]['state'] = 'fail'
+    #         cFile = self.hw_info[hw_id]['cfile']
+    #         if cFile is None:
+    #             return
+    #         if not os.path.isdir('exe_file'):
+    #             os.makedirs('exe_file')
+    #         exeFile = '%s//%s' % ('exe_file', os.path.split(cFile)[-1].split('.c')[0])
+    #         cmd = ['gcc', '-o', exeFile, cFile]
+    #         exeFile = '"%s.exe"' % (exeFile)
+    #         try:
+    #             subprocess.call(cmd, shell=True)
+    #         except:
+    #             self.hw_info[hw_id]['fail_info'] += 'can not compile .c file'
+    #         else:
+    #             num_test, num_pass = 0, 0
+    #             for input_, expected_output in testCase:
+    #                 num_test += 1
+    #                 # Launch a command with pipes
+    #                 p = subprocess.Popen(exeFile,stdout=subprocess.PIPE,stdin=subprocess.PIPE,
+    #                                      shell=True)
+    #                 # Send the data and get the output
+    #                 try:
+    #                     stdout, stderr = p.communicate(str(input_).encode(), timeout=3)
+    #                 except:
+    #                     s = '\n  <Test Case #%i> : timeout error for input [%s]' % (num_test, repr(str(input_)))
+    #                     self.hw_info[hw_id]['fail_info'] += s
+    #                 else:
+    #                     # To interpret as text, decode
+    #                     output = stdout.decode('utf-8')
+
+    #                     if(TestCase.processOutput(output) == TestCase.processOutput(expected_output)):
+    #                         num_pass += 1
+    #                     else:
+    #                         s = '\n\n  <Test Case #%i> : \n    input [%s], \n    expected output is [%s] \n    but got [%s]' % (num_test, repr(str(input_)), repr(expected_output), repr(output))
+    #                         self.hw_info[hw_id]['fail_info'] += s
+    #                     if stderr is not None:
+    #                         err = stderr.decode('utf-8')
+    #                         self.hw_info[hw_id]['fail_info'] += err
+
+    #             if num_pass == num_test:
+    #                 self.hw_info[hw_id]['state'] = 'pass'
+    #                 self.num_questions_pass += 1
+    #             else:
+    #                 self.hw_info[hw_id]['fail_info'] = 'Unable to pass all test cases (pass ratio %i/%i)'%(num_pass, num_test) + self.hw_info[hw_id]['fail_info']
 
     def __str__(self):
-        s = '-' * 50 + '\n'
-        s += "Student %s" % (self.stu_id)
+        
+        s = "\n## Student %s ##\n" % (self.stu_id)
+        l = len(s) - 2
+        s = '\n'+'#' * l + s + '#' * l + '\n'
+        s += '-' * 13
         for hw_id in self.hw_id_list:
             s += '\n[%s]' % (hw_id)
-            s += '\n\tcfile : %s' % (self.hw_info[hw_id]['cfile'])
-            s += '\n\tstate : %s' % (self.hw_info[hw_id]['state'])
+            s += '\t%s'%(self.hw_info[hw_id]['state'].capitalize())
             if self.hw_info[hw_id]['fail_info'].strip():
-                s += '\n\tfail_info : %s' % (self.hw_info[hw_id]['fail_info'])
-        s += '\n' + '-' * 50 + '\n'
+                s += '\n'
+                s += '\n  Fail_info : %s' % (self.hw_info[hw_id]['fail_info'])
+                s += '\n'
+            l = len(s.splitlines()[-1]) + 2
+            s += '\n'
+            s += '-' * l
         return s
 
 
@@ -153,27 +221,34 @@ for i, hw_id in enumerate(hw_id_list):
         output = test_case['output']
         testCase.append((input_, output))
 
-# # TA Version
-# with open("StuID.json") as f:
-#     json_data = json.load(f)
-#     student_id_list = json_data['stu_id_list']
+omit = ['\t', '\r', '\n']
 
 # Student Version
 print('Enter your student ID : ', end='')
 stuID = input()
 if stuID:
     print('AutoGrading for student %s' % stuID)
-    student_id_list = [stuID]
-
-student_list = []
-for stu_id in student_id_list:
-    student_list.append(Student(stu_id, hw_id_list))
-
-# Start Evaluate
-for stu in student_list:
+    print('Note : All the %s and extra white space will be ignored in the ouput' % omit)
+    stu = Student(stuID, hw_id_list)
     for testCase, hw_id in zip(testCase_list, hw_id_list):
         stu.runTestCase(hw_id, testCase)
     print(stu)
     print('Finish autoGrading, Your Score is %.2f (Pass %i/%i questions) ' % (stu.evaluate_score(), stu.num_questions_pass, stu.num_questions_total))
+print('\nPress anything to exit..')
+input()
 
-a = input()
+# # TA Version
+# with open("StuID.json") as f:
+#     json_data = json.load(f)
+#     student_id_list = json_data['stu_id_list']
+# student_list = []
+# for stu_id in student_id_list:
+#     student_list.append(Student(stu_id, hw_id_list))
+
+# # Start Evaluate
+# for stu in student_list:
+#     for testCase, hw_id in zip(testCase_list, hw_id_list):
+#         stu.runTestCase(hw_id, testCase)
+#     print(stu)
+#     print('Finish autoGrading, Your Score is %.2f (Pass %i/%i questions) ' % (stu.evaluate_score(), stu.num_questions_pass, stu.num_questions_total))
+# a = input()
