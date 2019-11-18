@@ -1,2 +1,0 @@
-1. pyinstaller --add-data=hw2.json;. autoGrading.py
-2. Create source_file folder in dist/autoGrading
