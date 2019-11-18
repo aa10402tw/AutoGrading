@@ -1,0 +1,130 @@
+{
+	"description" : "HW9", 
+	"num_questions": 6,
+	"hw_id_list" : ["hw9a", "hw9b", "hw9c", "hw9d", "hw9e", "hw9f"],
+	
+	"test_cases":
+	[
+		{
+			"hw_id" : "hw9a", 
+			"num_tests" : 3, 
+			
+			"test_case":
+			[
+				{
+					"input": "210",
+					"output": "22155"
+				},
+				{
+					"input": "10000",
+					"output": "50005000"
+				},
+				{
+					"input": "50000",
+					"output": "1250025000"
+				}
+			]
+		},
+		
+		{
+			"hw_id" : "hw9b", 
+			"num_tests" : 4, 
+			"test_case":
+			[
+				{
+					"input": "100 99",
+					"output": "1"
+				},
+				{
+					"input": "10000 9999",
+					"output": "1"
+				},
+				{
+					"input": "9 6",
+					"output": "3"
+				},
+				{
+					"input": "1 2",
+					"output": "1"
+				}
+			]
+		},
+		
+		{
+			"hw_id" : "hw9c", 
+			"num_tests" : 4, 
+			"test_case":
+			[
+				{
+					"input": "3\n10 -5 2\n-5",
+					"output": "0"
+				},
+				{
+					"input": "1\n-1\n-1",
+					"output": "0"
+				},
+				{
+					"input": "3\n8 -1 0\n2",
+					"output": "-1"
+				},
+				{
+					"input": "5\n-2 -500 -10 50 0\n-10",
+					"output": "1"
+				}
+			]
+		},
+		
+		{
+			"hw_id" : "hw9d", 
+			"num_tests" : 2, 
+			"test_case":
+			[
+				{
+					"input": "10",
+					"output": "1023"
+				},
+				{
+					"input": "6",
+					"output": "63"
+				}
+			]
+		},
+		
+		{
+			"hw_id" : "hw9e", 
+			"num_tests" : 2, 
+			"test_case":
+			[
+				{
+					"input": "-4Aac",
+					"output": "-4Aac\n-4Aca\n-4aAc\n-4acA\n-4cAa\n-4caA\n-A4ac\n-A4ca\n-Aa4c\n-Aac4\n-Ac4a\n-Aca4\n-a4Ac\n-a4cA\n-aA4c\n-aAc4\n-ac4A\n-acA4\n-c4Aa\n-c4aA\n-cA4a\n-cAa4\n-ca4A\n-caA4\n4-Aac\n4-Aca\n4-aAc\n4-acA\n4-cAa\n4-caA\n4A-ac\n4A-ca\n4Aa-c\n4Aac-\n4Ac-a\n4Aca-\n4a-Ac\n4a-cA\n4aA-c\n4aAc-\n4ac-A\n4acA-\n4c-Aa\n4c-aA\n4cA-a\n4cAa-\n4ca-A\n4caA-\nA-4ac\nA-4ca\nA-a4c\nA-ac4\nA-c4a\nA-ca4\nA4-ac\nA4-ca\nA4a-c\nA4ac-\nA4c-a\nA4ca-\nAa-4c\nAa-c4\nAa4-c\nAa4c-\nAac-4\nAac4-\nAc-4a\nAc-a4\nAc4-a\nAc4a-\nAca-4\nAca4-\na-4Ac\na-4cA\na-A4c\na-Ac4\na-c4A\na-cA4\na4-Ac\na4-cA\na4A-c\na4Ac-\na4c-A\na4cA-\naA-4c\naA-c4\naA4-c\naA4c-\naAc-4\naAc4-\nac-4A\nac-A4\nac4-A\nac4A-\nacA-4\nacA4-\nc-4Aa\nc-4aA\nc-A4a\nc-Aa4\nc-a4A\nc-aA4\nc4-Aa\nc4-aA\nc4A-a\nc4Aa-\nc4a-A\nc4aA-\ncA-4a\ncA-a4\ncA4-a\ncA4a-\ncAa-4\ncAa4-\nca-4A\nca-A4\nca4-A\nca4A-\ncaA-4\ncaA4-"
+				},
+				{
+					"input": "*A0z9",
+					"output": "*09Az\n*09zA\n*0A9z\n*0Az9\n*0z9A\n*0zA9\n*90Az\n*90zA\n*9A0z\n*9Az0\n*9z0A\n*9zA0\n*A09z\n*A0z9\n*A90z\n*A9z0\n*Az09\n*Az90\n*z09A\n*z0A9\n*z90A\n*z9A0\n*zA09\n*zA90\n0*9Az\n0*9zA\n0*A9z\n0*Az9\n0*z9A\n0*zA9\n09*Az\n09*zA\n09A*z\n09Az*\n09z*A\n09zA*\n0A*9z\n0A*z9\n0A9*z\n0A9z*\n0Az*9\n0Az9*\n0z*9A\n0z*A9\n0z9*A\n0z9A*\n0zA*9\n0zA9*\n9*0Az\n9*0zA\n9*A0z\n9*Az0\n9*z0A\n9*zA0\n90*Az\n90*zA\n90A*z\n90Az*\n90z*A\n90zA*\n9A*0z\n9A*z0\n9A0*z\n9A0z*\n9Az*0\n9Az0*\n9z*0A\n9z*A0\n9z0*A\n9z0A*\n9zA*0\n9zA0*\nA*09z\nA*0z9\nA*90z\nA*9z0\nA*z09\nA*z90\nA0*9z\nA0*z9\nA09*z\nA09z*\nA0z*9\nA0z9*\nA9*0z\nA9*z0\nA90*z\nA90z*\nA9z*0\nA9z0*\nAz*09\nAz*90\nAz0*9\nAz09*\nAz9*0\nAz90*\nz*09A\nz*0A9\nz*90A\nz*9A0\nz*A09\nz*A90\nz0*9A\nz0*A9\nz09*A\nz09A*\nz0A*9\nz0A9*\nz9*0A\nz9*A0\nz90*A\nz90A*\nz9A*0\nz9A0*\nzA*09\nzA*90\nzA0*9\nzA09*\nzA9*0\nzA90*"
+				}
+			]
+		},
+		
+		{
+			"hw_id" : "hw9f", 
+			"num_tests" : 3, 
+			"test_case":
+			[
+				{
+					"input": "6",
+					"output": "4"
+				},
+				{
+					"input": "2",
+					"output": "0"
+				},
+				{
+					"input": "14",
+					"output": "365596"
+				}
+			]
+		}
+	
+	]
+}
