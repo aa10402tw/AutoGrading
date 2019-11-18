@@ -4,6 +4,7 @@ Then execute Autograding program by:
 	
 	python autoGrading.py
 	
-If you use Student Version, you need to enter the [stu-id] (0 for example)
+For Student Version, the student to be graded need to be specified through command line. (0 for example).
+For TA Version, all the students listed in StuID.json will be graded. 
 	
 	
